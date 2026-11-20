@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="ur-Latn">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Tumhara Wanted Level – Sehrish Creates</title>
+<meta name="description" content="Naam aur shehar likho, apna neon Wanted poster banao aur doston ko bhejo.">
+<meta property="og:title" content="Tumhara Wanted Level kitna hai? 🌴">
+<meta property="og:description" content="Naam + shehar dalo, neon wanted poster lo, share karo.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bungee&family=Rubik:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{--night:#12062b;--pink:#ff2e88;--orange:#ff8a3d;--cyan:#29e6ff;--cream:#fff3e0}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:radial-gradient(120% 70% at 50% 0,#3a0f5e 0,var(--night) 60%);color:var(--cream);font:400 16px/1.5 Rubik,system-ui,sans-serif;min-height:100vh}
+main{max-width:520px;margin:0 auto;padding:28px 18px 40px}
+h1{font:400 clamp(30px,9vw,46px)/1 Bungee,Impact,sans-serif;margin:0 0 8px;color:var(--cream);text-shadow:0 0 18px var(--pink),0 0 2px var(--pink)}
+p.lead{margin:0 0 22px;max-width:44ch;opacity:.9}
+label{display:block;font-weight:600;margin:0 0 6px}
+input{width:100%;font:inherit;color:var(--cream);background:#1d0a40;border:2px solid #4b2480;border-radius:10px;padding:13px 14px;margin-bottom:16px}
+input:focus-visible,button:focus-visible{outline:3px solid var(--cyan);outline-offset:2px}
+input::placeholder{color:#9b84c4}
+.go{width:100%;font:400 20px Bungee,Impact,sans-serif;color:#1a0633;background:linear-gradient(90deg,var(--orange),var(--pink));border:0;border-radius:12px;padding:15px;cursor:pointer;box-shadow:0 0 22px rgba(255,46,136,.55)}
+.go:active{transform:translateY(1px)}
+#out{margin-top:28px}
+canvas{width:100%;height:auto;display:block;border-radius:6px;box-shadow:0 0 40px rgba(255,46,136,.45)}
+.row{display:flex;gap:10px;margin-top:14px}
+.row button{flex:1;font:600 16px Rubik,sans-serif;padding:13px;border-radius:10px;cursor:pointer;border:2px solid var(--cyan);background:transparent;color:var(--cyan)}
+.row button.main{background:var(--cyan);color:#06222a}
+small{display:block;margin-top:26px;opacity:.6;font-size:12px}
+.hide{display:none}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+</head>
+<body>
+<main>
+<h1>Tumhara Wanted Level</h1>
+<p class="lead">Naam aur shehar likho. Dekho police tumhe kitne star se dhoondh rahi hai, phir poster dosto ko bhejo.</p>
+
+<label for="n">Tumhara naam</label>
+<input id="n" maxlength="18" placeholder="e.g. Ayesha" autocomplete="off">
+<label for="c">Shehar</label>
+<input id="c" maxlength="18" placeholder="e.g. Karachi" autocomplete="off">
+<button class="go" id="go">Poster banao</button>
+
+<section id="out" class="hide" aria-live="polite">
+  <canvas id="cv" width="1080" height="1350" role="img" aria-label="Tumhara wanted poster"></canvas>
+  <div class="row">
+    <button class="main" id="share">Share karo</button>
+    <button id="dl">Save PNG</button>
+  </div>
+</section>
+
+<small>Fan-made mazaak, sirf entertainment ke liye. Kisi game company se koi taluq nahi. Saare "jurm" jhoote hain.</small>
+</main>
+
+<script>
+(function(){
+var SITE="sehrishcreatespk.com";
+var crimes=[
+"Chai mein 3 chamach cheeni daalna","Group chat mein seen karke reply na dena","Dost ka charger 'ek minute' ke liye lena aur wapas na karna",
+"Raat 3 baje tak reels dekhna, subah 'main to so raha tha' kehna","Biryani mein se sab botiyan nikaal lena","Load shedding mein bhi WiFi ka password na batana",
+"Exam se pehle 'kuch nahi parha' bol ke 90 lena","Shaadi mein teen baar khana lena","Rickshaw wale se 20 rupay par 10 minute behas",
+"Family group mein good morning ki 40 photos","Dost ki fries ko 'sirf ek' keh kar aadhi khaana","Phone 1% par bhi ghanta bhar baat karna",
+"Library mein bhi loud hasna","Mummy ke 'abhi aaya' ke baad 2 ghante gayab","Cricket mein out hoke 'ye to no-ball thi' kehna",
+"Online class mein camera off karke so jaana","Sab ke samne 'main diet par hoon' bol ke dessert 2 baar","Gaadi mein AC full aur khidki khuli"];
+var tags=["Neon","Turbo","Desi","Midnight","Rocket","Chill","Savage","Vice","Dhamaka","Phantom"];
+var nicks=["Tezz","Boss","Don","Bhai","Rider","Shadow","King","Jugaad"];
+
+function hash(s){var h=2166136261;for(var i=0;i<s.length;i++){h^=s.charCodeAt(i);h=Math.imul(h,16777619)}return h>>>0}
+function rng(seed){return function(){seed=Math.imul(seed^(seed>>>15),2246822507);seed^=seed>>>13;seed=Math.imul(seed,3266489909);seed^=seed>>>16;return (seed>>>0)/4294967296}}
+function title(s){return s.trim().replace(/\s+/g,' ').replace(/\b\w/g,function(m){return m.toUpperCase()})}
+
+function make(name,city){
+  var r=rng(hash(name.toLowerCase()+'|'+city.toLowerCase()));
+  var stars=1+Math.floor(r()*5);
+  var picked=[],pool=crimes.slice();
+  for(var i=0;i<3;i++){picked.push(pool.splice(Math.floor(r()*pool.length),1)[0])}
+  var bounty=(Math.floor(r()*90)+10)*(stars*5000);
+  var alias=tags[Math.floor(r()*tags.length)]+" "+nicks[Math.floor(r()*nicks.length)];
+  return {stars:stars,crimes:picked,bounty:bounty,alias:alias};
+}
+
+function fit(ctx,text,max,size,font){
+  do{ctx.font=size+"px "+font;size-=2}while(ctx.measureText(text).width>max&&size>24);
+}
+function wrap(ctx,text,x,y,max,lh){
+  var words=text.split(' '),line='';
+  for(var i=0;i<words.length;i++){
+    var t=line?line+' '+words[i]:words[i];
+    if(ctx.measureText(t).width>max&&line){ctx.fillText(line,x,y);line=words[i];y+=lh}else line=t;
+  }
+  ctx.fillText(line,x,y);return y+lh;
+}
+function star(ctx,cx,cy,R,on){
+  ctx.beginPath();
+  for(var i=0;i<10;i++){var a=-Math.PI/2+i*Math.PI/5,rad=i%2?R*0.45:R;ctx.lineTo(cx+Math.cos(a)*rad,cy+Math.sin(a)*rad)}
+  ctx.closePath();
+  if(on){ctx.shadowColor="#ff2e88";ctx.shadowBlur=26;ctx.fillStyle="#ffd23f";ctx.fill();ctx.shadowBlur=0}
+  else{ctx.lineWidth=5;ctx.strokeStyle="rgba(255,243,224,.28)";ctx.stroke()}
+}
+
+function draw(name,city){
+  var d=make(name,city),cv=document.getElementById('cv'),ctx=cv.getContext('2d'),W=1080,H=1350,D="Bungee, Impact, sans-serif",B="Rubik, system-ui, sans-serif";
+  var g=ctx.createLinearGradient(0,0,0,H);g.addColorStop(0,"#12062b");g.addColorStop(.55,"#4a0f63");g.addColorStop(1,"#ff5a5f");
+  ctx.fillStyle=g;ctx.fillRect(0,0,W,H);
+  // sun
+  var sg=ctx.createLinearGradient(0,760,0,1100);sg.addColorStop(0,"#ffd23f");sg.addColorStop(1,"#ff2e88");
+  ctx.fillStyle=sg;ctx.beginPath();ctx.arc(W/2,980,260,0,Math.PI*2);ctx.fill();
+  ctx.fillStyle="#2a0a4a";for(var i=0;i<6;i++){ctx.fillRect(W/2-270,900+i*46,540,6+i*3)}
+  // floor grid
+  ctx.fillStyle="#12062b";ctx.fillRect(0,1130,W,220);
+  ctx.strokeStyle="rgba(41,230,255,.55)";ctx.lineWidth=2;
+  for(var x=-600;x<=1680;x+=120){ctx.beginPath();ctx.moveTo(W/2+(x-W/2)*.15,1130);ctx.lineTo(x,H);ctx.stroke()}
+  for(var y=0;y<6;y++){var yy=1130+Math.pow(y/6,1.8)*220;ctx.beginPath();ctx.moveTo(0,yy);ctx.lineTo(W,yy);ctx.stroke()}
+  ctx.fillStyle="#12062b";ctx.fillRect(0,1130,W,3);
+  // frame
+  ctx.strokeStyle="#29e6ff";ctx.shadowColor="#29e6ff";ctx.shadowBlur=18;ctx.lineWidth=6;ctx.strokeRect(36,36,W-72,H-72);ctx.shadowBlur=0;
+  ctx.textAlign="center";
+  // WANTED
+  ctx.font="150px "+D;ctx.fillStyle="#fff3e0";ctx.shadowColor="#ff2e88";ctx.shadowBlur=34;ctx.fillText("WANTED",W/2,220);ctx.shadowBlur=0;
+  // stars
+  for(var s=0;s<5;s++)star(ctx,W/2+(s-2)*130,330,56,s<d.stars);
+  // name
+  ctx.fillStyle="#ff8a3d";fit(ctx,name.toUpperCase(),W-160,128,D);ctx.shadowColor="#ff8a3d";ctx.shadowBlur=22;ctx.fillText(name.toUpperCase(),W/2,500);ctx.shadowBlur=0;
+  ctx.fillStyle="#fff3e0";ctx.font="600 38px "+B;ctx.fillText("alias \u201C"+d.alias+"\u201D  \u2022  "+city,W/2,562);
+  // crimes
+  ctx.textAlign="left";ctx.font="600 30px "+B;ctx.fillStyle="#29e6ff";ctx.fillText("JURM:",90,640);
+  ctx.fillStyle="#fff3e0";ctx.font="400 34px "+B;var y=690;
+  for(var k=0;k<d.crimes.length;k++){ctx.fillText("\u25B8",90,y);y=wrap(ctx,d.crimes[k],140,y,W-230,42)+10}
+  // bounty
+  ctx.textAlign="center";ctx.fillStyle="#ffd23f";ctx.shadowColor="#ffd23f";ctx.shadowBlur=16;
+  ctx.font="62px "+D;ctx.fillText("INAAM Rs "+d.bounty.toLocaleString('en-US'),W/2,1010);ctx.shadowBlur=0;
+  ctx.fillStyle="#fff3e0";ctx.font="600 30px "+B;ctx.fillText(d.stars+" star wanted \u2022 dhoondne walon ko chai milegi",W/2,1060);
+  // footer
+  ctx.fillStyle="#fff3e0";ctx.font="600 34px "+B;ctx.fillText("Tumhara kitna hai? "+SITE,W/2,1285);
+}
+
+var cv=document.getElementById('cv'),out=document.getElementById('out'),n=document.getElementById('n'),c=document.getElementById('c');
+function run(){
+  var name=title(n.value),city=title(c.value);
+  if(!name){n.focus();n.placeholder="Pehle naam likho";return}
+  if(!city)city="Pakistan";
+  var go=function(){draw(name,city);out.classList.remove('hide');out.scrollIntoView({behavior:'smooth',block:'start'})};
+  if(document.fonts&&document.fonts.load){
+    Promise.all([document.fonts.load("150px Bungee"),document.fonts.load("600 30px Rubik"),document.fonts.load("400 30px Rubik")]).then(go,go);
+  }else go();
+}
+document.getElementById('go').onclick=run;
+[n,c].forEach(function(el){el.addEventListener('keydown',function(e){if(e.key==='Enter')run()})});
+
+function blob(cb){cv.toBlob(cb,'image/png')}
+document.getElementById('dl').onclick=function(){
+  blob(function(b){var a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='wanted-poster.png';a.click();setTimeout(function(){URL.revokeObjectURL(a.href)},2000)});
+};
+document.getElementById('share').onclick=function(){
+  blob(function(b){
+    var f=new File([b],'wanted-poster.png',{type:'image/png'});
+    var data={files:[f],title:'Mera Wanted Level',text:'Mera wanted level dekho! Tumhara kitna hai? '+SITE};
+    if(navigator.canShare&&navigator.canShare({files:[f]})&&navigator.share){navigator.share(data).catch(function(){})}
+    else document.getElementById('dl').click();
+  });
+};
+})();
+</script>
+</body>
+</html>
